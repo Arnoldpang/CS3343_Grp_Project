@@ -1,25 +1,34 @@
 package main.item;
 
 public class loginStatus {
-    public static boolean loginStatus;
+    private static loginStatus instance;
+    private boolean loginStatus;
 
     public loginStatus(){
         this.loginStatus = false;
     }
 
-    public static void login(String username, String password){
+    public void login(String username, String password){
         if (username.equals("admin") || password.equals("admin")){
-            this.loginStatus =  true;
+            instance.setLoginStatus(true);
+            System.out.println("Login success");
         }else{
-            this.loginStatus = false;
+            instance.setLoginStatus(false);
         }
     }
 
-    public loginStatus getInstance(){
-        return new loginStatus();
+    public static loginStatus getInstance(){
+        if(instance == null){
+            instance = new loginStatus();
+        }
+        return instance;
     }
 
     public boolean getLoginStatus(){
         return this.loginStatus;
+    }
+
+    public void setLoginStatus(boolean status){
+        this.loginStatus = status;
     }
 }

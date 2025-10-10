@@ -5,14 +5,17 @@ import main.item.loginStatus;
 import java.util.Scanner;
 
 public class loginCommand implements Command {
+    Scanner scanner;
     @Override
     public void execute(Scanner sc) {
+        scanner = sc;
         String username, password;
         System.out.println("Username:");
-        username = sc.nextLine();
+        username = scanner.next();
         System.out.println("Password:");
-        password = sc.nextLine();
-        loginStatus.login(username,password);
+        password = scanner.next();
+        loginStatus login = loginStatus.getInstance();
+        login.login(username, password);
     }
 
     public loginCommand(){
