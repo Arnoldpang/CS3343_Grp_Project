@@ -10,9 +10,9 @@ public class loginCommand implements Command {
     public void execute(Scanner sc) {
         scanner = sc;
         String username, password;
-        System.out.println("Username:");
+        System.out.print("Username: ");
         username = scanner.next();
-        System.out.println("Password:");
+        System.out.print("Password: ");
         password = scanner.next();
         loginStatus login = loginStatus.getInstance();
         login.login(username, password);
@@ -20,13 +20,5 @@ public class loginCommand implements Command {
 
     public loginCommand(){
 
-    }
-
-    private boolean login(String username,String password){
-        if (username.equals("admin") || password.equals("admin")){
-            return true;
-        }else{
-            return false;
-        }
     }
 }

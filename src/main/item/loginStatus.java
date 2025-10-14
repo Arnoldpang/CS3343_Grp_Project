@@ -4,7 +4,7 @@ public class loginStatus {
     private static loginStatus instance;
     private boolean loginStatus;
 
-    public loginStatus(){
+    private loginStatus(){
         this.loginStatus = false;
     }
 
@@ -12,9 +12,11 @@ public class loginStatus {
         if (username.equals("admin") || password.equals("admin")){
             instance.setLoginStatus(true);
             System.out.println("Login success");
-        }else{
-            instance.setLoginStatus(false);
         }
+    }
+
+    public void logout(){
+        instance.setLoginStatus(false);
     }
 
     public static loginStatus getInstance(){
