@@ -20,7 +20,7 @@ public class main {
                 commandList.get(inputInt).execute(sc);
             }else{
                 // todo
-                System.out.print("Input number of commands (1: logout): ");
+                System.out.print("Input number of commands (0: Exit, 1: logout): ");
                 int inputInt =sc.nextInt();
                 commandList.get(inputInt).execute(sc);
             }
