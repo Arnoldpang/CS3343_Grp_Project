@@ -10,7 +10,7 @@ public class deleteResourceCommand implements Command{
     @Override
     public void execute(Scanner sc) {
         System.out.println("Input target resource name");
-        String input = sc.next();
+        String input = sc.nextLine();
         Resource rs = Resource.getResource(input);
         rs.deleteResources();
     }

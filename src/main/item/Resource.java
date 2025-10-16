@@ -1,55 +1,99 @@
 package main.item;
 
+import java.util.Date; // 新增：用於日期相關
 import java.util.HashMap;
-
-
 
 public class Resource {
     private static HashMap<String, Resource> Resources = new HashMap<>();
     private static HashMap<String, Resource> DeletedItem = new HashMap<>();
-    String name;
-    private static enum status{
+
+    private String name; // 修改：從 public 改為 private 以符合封裝
+    private int capacity; // 新增：資源容量
+    private HashMap<Date, Boolean> availabilitySchedule; // 新增：可用性時間表（日期 -> 是否可用）
+
+    private enum status { // 修改：從 static enum 改為 private enum
         AVAILABLE, BORROWED, DELETED
     }
     private status status;
 
-    private Resource(String name){
+    private Resource(String name, int capacity) { // 修改：constructor 新增 capacity 參數，並初始化 availabilitySchedule
         this.name = name;
+        this.capacity = capacity;
         this.status = status.AVAILABLE;
+        this.availabilitySchedule = new HashMap<>(); // 初始化為空 Map，可後續新增日期
     }
 
-    public static void createResource(String name){
-        Resource rs = new Resource(name);
+    public static void createResource(String name, int capacity) { // 修改：createResource 新增 capacity 參數
+        Resource rs = new Resource(name, capacity);
         Resources.put(name, rs);
     }
 
-    public static Resource getResource(String name){
+    public static Resource getResource(String name) {
         return Resources.get(name);
     }
 
-    public static void printResources(){
+    public static void printResources() {
         System.out.println("Resources:");
         for (String key : Resources.keySet()) {
-            System.out.println(key + " - " + Resources.get(key).getStatus());
+            Resource rs = Resources.get(key);
+            System.out.println(key + " - " + rs.getStatus() + " (Capacity: " + rs.getCapacity() + ", Utilization: " + rs.getUtilization() + "%)");
         }
         if(Resources.isEmpty())
             System.out.println("Null");
     }
 
-    public void setStatus(status status){
+    private void setStatus(status status) { // 修改：從 public 改為 private，內部使用
         this.status = status;
     }
 
-    public void deleteResources(){
+    public void deleteResources() {
         this.setStatus(status.DELETED);
         DeletedItem.put(name, this);
+        Resources.remove(name); // 新增：真正從 Resources 中移除
+        this.availabilitySchedule.clear(); // 新增：清理可用性時間表
     }
 
-    public void borrowResource(){
-        this.setStatus(status.BORROWED);
+    public void borrowResource() {
+        if (this.status == status.AVAILABLE) { // 新增：檢查是否可用，避免重複借用
+            this.setStatus(status.BORROWED);
+        } else {
+            System.out.println("Resource is not available for borrowing.");
+        }
     }
 
-    public String getStatus(){
+    public String getStatus() {
         return this.status.toString();
+    }
+
+    // 新增：getter 和 setter for capacity
+    public int getCapacity() {
+        return this.capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        if (capacity > 0) {
+            this.capacity = capacity;
+        } else {
+            System.out.println("Capacity must be positive.");
+        }
+    }
+
+    // 新增：更新特定日期的可用性
+    public void updateAvailability(Date date, boolean isAvailable) {
+        this.availabilitySchedule.put(date, isAvailable);
+    }
+
+    // 新增：檢查特定日期是否可用
+    public boolean isAvailableOnDate(Date date) {
+        return this.availabilitySchedule.getOrDefault(date, false); // 預設不可用，如果未設定
+    }
+
+    // 新增：計算利用率（例如，可用日期比例，假設總日期為 schedule 大小）
+    public double getUtilization() {
+        if (availabilitySchedule.isEmpty()) {
+            return 0.0;
+        }
+        long availableCount = availabilitySchedule.values().stream().filter(b -> b).count();
+        return (double) availableCount / availabilitySchedule.size() * 100;
     }
 }
