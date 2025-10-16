@@ -17,6 +17,7 @@ public class manageResourceCommand implements Command{
     }
 
     public void init(){
+        commandList = new HashMap<>();
         commandList.put(1, new displayResourcesCommand());
         commandList.put(2, new createNewResourceCommand());
         commandList.put(3, new borrowResourceCommand());

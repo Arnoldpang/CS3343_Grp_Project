@@ -32,6 +32,8 @@ public class Resource {
         for (String key : Resources.keySet()) {
             System.out.println(key + " - " + Resources.get(key).getStatus());
         }
+        if(Resources.isEmpty())
+            System.out.println("Null");
     }
 
     public void setStatus(status status){

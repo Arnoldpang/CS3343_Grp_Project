@@ -13,21 +13,26 @@ public class main {
     public static void main(String[] args) {
     	init();
         boolean login=false;
-        do{
-            if(!login){
-                System.out.print("Input number of commands (0: Exit, 9: Login): ");
-                int inputInt =sc.nextInt();
-                commandList.get(inputInt).execute(sc);
-            }else{
-                // todo
-                System.out.print("Input number of commands (0: Exit, 1: logout): ");
-                int inputInt =sc.nextInt();
-                commandList.get(inputInt).execute(sc);
-            }
+        try{
+            do{
+                if(!login){
+                    System.out.print("Input number of commands (0: Exit, 9: Login): ");
+                    int inputInt =sc.nextInt();
+                    commandList.get(inputInt).execute(sc);
+                }else{
+                    // todo
+                    System.out.print("Input number of commands (0: Exit, 1: logout, 2: Resources Management): ");
+                    int inputInt =sc.nextInt();
+                    commandList.get(inputInt).execute(sc);
+                }
 
 
-            login = loginStatus.getInstance().getLoginStatus();
-        }while(true);
+                login = loginStatus.getInstance().getLoginStatus();
+            }while(true);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
     }
     public static void init() {
         sc = new Scanner(System.in);
@@ -35,5 +40,6 @@ public class main {
         commandList.put(0, new exitCommand());
         commandList.put(9, new loginCommand());
         commandList.put(1, new logoutCommand());
+        commandList.put(2, new manageResourceCommand());
     }
 }
