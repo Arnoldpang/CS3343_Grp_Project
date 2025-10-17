@@ -59,7 +59,7 @@ public class Task {
         tasks.remove(id);
     }
 
-    // Getter 方法（新增 getDescription, getStartTime, getEndTime）
+
     public int getId() { return id; }
     public String getName() { return name; }
     public String getDescription() { return description; } // 新增
