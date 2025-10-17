@@ -3,6 +3,8 @@ package main.item;
 import java.util.Date; // 新增：用於日期相關
 import java.util.HashMap;
 
+
+
 public class Resource {
     private static HashMap<String, Resource> Resources = new HashMap<>();
     private static HashMap<String, Resource> DeletedItem = new HashMap<>();
@@ -28,11 +30,15 @@ public class Resource {
         Resources.put(name, rs);
     }
 
-    public static Resource getResource(String name) {
-        return Resources.get(name);
+    public static Resource getResource(String name){
+        for (Resource r : Resources.values()){
+            r.getName().toLowerCase().equals(name.toLowerCase());
+            return r;
+        }
+        return null;
     }
 
-    public static void printResources() {
+    public static void printResources(){
         System.out.println("Resources:");
         for (String key : Resources.keySet()) {
             Resource rs = Resources.get(key);
@@ -61,7 +67,18 @@ public class Resource {
         }
     }
 
-    public String getStatus() {
+    public void returnResource(){
+        if (this.status == status.BORROWED) { // 新增：檢查是否可用，避免重複借用
+            this.setStatus(status.AVAILABLE);
+        } else if(this.status == status.DELETED) {
+            System.out.println("Cannot return deleted resource.");
+        }else {
+            System.out.println("Resource is available for borrowing. No need to return.");
+        }
+
+    }
+
+    public String getStatus(){
         return this.status.toString();
     }
 
@@ -77,6 +94,9 @@ public class Resource {
             System.out.println("Capacity must be positive.");
         }
     }
+
+    public String getName(){return this.name;}
+
 
     // 新增：更新特定日期的可用性
     public void updateAvailability(Date date, boolean isAvailable) {

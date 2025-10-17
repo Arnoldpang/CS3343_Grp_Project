@@ -21,7 +21,7 @@ public class main {
                 commandList.get(inputInt).execute(sc);
             }else{
                 // todo
-                System.out.print("Input number of commands (0: Exit, 1: logout, 2: manage Resource, 3: manage Task): ");
+                System.out.print("Input number of commands (1: logout, 2: manage Resource, 3: manage Task): ");
                 int inputInt =sc.nextInt();
                 sc.nextLine();
                 commandList.get(inputInt).execute(sc);
