@@ -1,7 +1,9 @@
 package main.item;
 
-import java.util.Date; // 新增：用於日期相關
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 public class Resource {
     private static HashMap<String, Resource> Resources = new HashMap<>();
@@ -83,9 +85,8 @@ public class Resource {
         this.availabilitySchedule.put(date, isAvailable);
     }
 
-    // 新增：檢查特定日期是否可用
     public boolean isAvailableOnDate(Date date) {
-        return this.availabilitySchedule.getOrDefault(date, false); // 預設不可用，如果未設定
+        return this.availabilitySchedule.getOrDefault(date, true); // 改為預設 true (可用)
     }
 
     // 新增：計算利用率（例如，可用日期比例，假設總日期為 schedule 大小）
@@ -95,5 +96,13 @@ public class Resource {
         }
         long availableCount = availabilitySchedule.values().stream().filter(b -> b).count();
         return (double) availableCount / availabilitySchedule.size() * 100;
+    }
+
+    public static List<Resource> getAllResources() {
+        return new ArrayList<>(Resources.values());
+    }
+
+    public String getName() {
+        return this.name;
     }
 }
