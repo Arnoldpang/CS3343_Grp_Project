@@ -14,16 +14,17 @@ public class Task {
     private int studentsNumber; // 學生人數
     private long durationMinutes; // 持續時間（分鐘）
     private int priority; // 1-10，越高越優先
-    private List<Resource> requiredResources; // 所需資源列表（自動分配）
-    private String assignedDay; // 新增：分配的日子 (e.g., "Monday")
-    private int assignedStartHour; // 新增：開始小時 (e.g., 8 for 8:00 AM)
+    private static List<Resource> requiredResources; // 所需資源列表（自動分配）
+    private String assignedDay; // 分配的日子
+    private int assignedStartHour; // 開始小時
+    private String major; // 新增：專業 (e.g., "computer science", "bio")
 
     private enum Status { // 任務狀態
         PENDING, IN_PROGRESS, COMPLETED
     }
     private Status status;
 
-    private Task(String name, String description, int studentsNumber, long durationMinutes, int priority, List<Resource> requiredResources) {
+    private Task(String name, String description, int studentsNumber, long durationMinutes, int priority, List<Resource> requiredResources, String major) {
         this.id = nextId++;
         this.name = name;
         this.description = description;
@@ -32,17 +33,18 @@ public class Task {
         this.priority = priority;
         this.requiredResources = (requiredResources != null) ? requiredResources : new ArrayList<>();
         this.status = Status.PENDING;
-        this.assignedDay = null; // 初始為 null，調度時設定
-        this.assignedStartHour = -1; // 初始為 -1，表示未分配
+        this.assignedDay = null;
+        this.assignedStartHour = -1;
+        this.major = major; // 新增
 
-        // 驗證：人數 > 0，持續時間 > 0
-        if (studentsNumber <= 0 || durationMinutes <= 0) {
-            throw new IllegalArgumentException("Students number and duration must be positive.");
+        // 驗證
+        if (studentsNumber <= 0 || durationMinutes <= 0 || major == null || major.isEmpty()) {
+            throw new IllegalArgumentException("Students number, duration, and major must be valid.");
         }
     }
 
-    public static void createTask(String name, String description, int studentsNumber, long durationMinutes, int priority, List<Resource> requiredResources) {
-        Task task = new Task(name, description, studentsNumber, durationMinutes, priority, requiredResources);
+    public static void createTask(String name, String description, int studentsNumber, long durationMinutes, int priority, String major) {
+        Task task = new Task(name, description, studentsNumber, durationMinutes, priority, requiredResources, major); // 新增 major
         tasks.put(task.getId(), task);
     }
 
@@ -50,7 +52,7 @@ public class Task {
         return tasks.get(id);
     }
 
-    public static List<Task> getAllTasks() { // 新增：取得所有任務的列表
+    public static List<Task> getAllTasks() {
         return new ArrayList<>(tasks.values());
     }
 
@@ -58,9 +60,9 @@ public class Task {
         System.out.println("Tasks:");
         for (Integer key : tasks.keySet()) {
             Task t = tasks.get(key);
-            String resourceNames = t.getRequiredResources().isEmpty() ? "None" : t.getRequiredResources().get(0).getName(); // 假設單一資源
+            String resourceNames = t.getRequiredResources().isEmpty() ? "None" : t.getRequiredResources().get(0).getName();
             String timeInfo = (t.assignedDay != null) ? " (" + t.assignedDay + " at " + t.assignedStartHour + ":00)" : " (Unassigned)";
-            System.out.println("ID: " + key + " - Name: " + t.getName() + " - Students: " + t.getStudentsNumber() + " - Duration: " + t.getDurationMinutes() + " min" +
+            System.out.println("ID: " + key + " - Name: " + t.getName() + " - Major: " + t.getMajor() + " - Students: " + t.getStudentsNumber() + " - Duration: " + t.getDurationMinutes() + " min" +
                     " - Priority: " + t.getPriority() + " - Resource: " + resourceNames + timeInfo + " - Status: " + t.getStatus());
         }
     }
@@ -78,10 +80,11 @@ public class Task {
     public int getPriority() { return priority; }
     public String getStatus() { return status.toString(); }
     public List<Resource> getRequiredResources() { return requiredResources; }
-    public String getAssignedDay() { return assignedDay; } // 新增 getter
-    public int getAssignedStartHour() { return assignedStartHour; } // 新增 getter
+    public String getAssignedDay() { return assignedDay; }
+    public int getAssignedStartHour() { return assignedStartHour; }
+    public String getMajor() { return major; } // 新增 getter
 
-    // Setter 方法（供調度使用）
+    // Setter 方法
     public void setAssignedDay(String day) {
         this.assignedDay = day;
     }
@@ -94,7 +97,7 @@ public class Task {
         }
     }
 
-    // 更新方法（調整為更新新屬性，如果需要）
+    // 更新方法
     public void updateDetails(String newDescription, int newStudentsNumber, long newDurationMinutes) {
         this.description = newDescription;
         this.studentsNumber = newStudentsNumber;
@@ -103,6 +106,4 @@ public class Task {
             throw new IllegalArgumentException("Students number and duration must be positive.");
         }
     }
-
-    // ... (其他方法，如果有)
 }

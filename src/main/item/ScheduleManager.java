@@ -10,7 +10,7 @@ public class ScheduleManager {
     private static final int END_HOUR = 23; // 11 PM
     private static final int SLOT_DURATION_MIN = 60; // 每槽 60 min
 
-    // 儲存分配：Map<Day, Map<Hour, AssignedTask>>
+    // 儲存分配：Map<Day, Map<Hour, Task>>
     private Map<String, Map<Integer, Task>> schedule = new HashMap<>();
 
     public ScheduleManager() {
@@ -35,9 +35,14 @@ public class ScheduleManager {
 
         // 為每個任務分配
         List<Resource> allResources = Resource.getAllResources();
-        allResources.sort(Comparator.comparingInt(Resource::getCapacity).reversed()); // capacity 降序
+        allResources.sort(Comparator.comparingDouble(this::getResourceLoad)  // 先低負載
+                .thenComparing(Comparator.comparingInt(Resource::getCapacity).reversed()));
 
         for (Task task : allTasks) {
+            // 動態排序資源：優先利用率低（空置）的，然後容量大
+            allResources.sort(Comparator.comparingDouble(Resource::getUtilization)
+                    .thenComparing(Comparator.comparingInt(Resource::getCapacity).reversed()));
+
             boolean allocated = false;
             int slotsNeeded = (int) Math.ceil((double) task.getDurationMinutes() / SLOT_DURATION_MIN);
 
@@ -82,9 +87,9 @@ public class ScheduleManager {
 
     private boolean isResourceFree(Resource res, String day, int startHour, int slotsNeeded) {
         Calendar cal = Calendar.getInstance();
-        cal.set(2025, 9, 17); // Calendar.MONTH is 0-based, 9 = October
+        cal.set(2025, 9, 17); // October 17, 2025 基準，調整 day
         int dayIndex = Arrays.asList(DAYS).indexOf(day);
-        cal.add(Calendar.DAY_OF_YEAR, dayIndex);
+        cal.add(Calendar.DAY_OF_YEAR, dayIndex); // 模擬不同日子
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
@@ -125,15 +130,32 @@ public class ScheduleManager {
     }
 
     public void printSchedule() {
-        for (String day : DAYS) {
-            System.out.println("\n# Schedule for " + day);
-            Map<Integer, Task> daySlots = schedule.get(day);
-            for (int hour = START_HOUR; hour < END_HOUR; hour++) {
-                Task t = daySlots.get(hour);
-                String taskInfo = (t != null) ? t.getName() + " (ID:" + t.getId() + ", Students:" + t.getStudentsNumber() + ")" : "Free";
-                System.out.println(hour + ":00 - " + (hour+1) + ":00 : " + taskInfo);
+        List<Task> allTasks = Task.getAllTasks();
+        Set<String> majors = new HashSet<>();
+        for (Task t : allTasks) {
+            majors.add(t.getMajor());
+        }
+
+        for (String major : majors) {
+            System.out.println("\n=== Schedule for Major: " + major + " ===");
+            for (String day : DAYS) {
+                System.out.println("\n# Day: " + day);
+                Map<Integer, Task> daySlots = schedule.get(day);
+                for (int hour = START_HOUR; hour < END_HOUR; hour++) {
+                    Task t = daySlots.get(hour);
+                    String taskInfo = (t != null && t.getMajor().equals(major)) ? t.getName() + " (ID:" + t.getId() + ", Students:" + t.getStudentsNumber() + ")" : "Free";
+                    System.out.println(hour + ":00 - " + (hour+1) + ":00 : " + taskInfo);
+                }
             }
         }
+    }
+
+    private double getResourceLoad(Resource res) {
+        if (res.availabilitySchedule.isEmpty()) {
+            return 0.0;
+        }
+        long busyCount = res.availabilitySchedule.values().stream().filter(b -> !b).count(); // false = 忙碌
+        return (double) busyCount / res.availabilitySchedule.size();
     }
 
     // 新增到 Task：靜態 getAllTasks()

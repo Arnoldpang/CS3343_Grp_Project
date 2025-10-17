@@ -13,6 +13,9 @@ public class createTaskCommand implements Command {
 
     @Override
     public void execute(Scanner sc) {
+
+        System.out.print("Input major (e.g., computer science, bio): "); // 新增輸入
+        String major = sc.nextLine();
         System.out.print("Input number of classes to create: ");
         int numClasses = sc.nextInt();
         sc.nextLine(); // 消耗換行符
@@ -38,12 +41,12 @@ public class createTaskCommand implements Command {
             int priority = sc.nextInt();
             sc.nextLine();
 
-            taskInfos.add(new TaskInfo(name, description, studentsNumber, durationMinutes, priority));
+            taskInfos.add(new TaskInfo(name, description, studentsNumber, durationMinutes, priority, major));
         }
 
         // 現在創建所有 Task
         for (TaskInfo info : taskInfos) {
-            Task.createTask(info.name, info.description, info.studentsNumber, info.durationMinutes, info.priority, null); // requiredResources 後續分配
+            Task.createTask(info.name, info.description, info.studentsNumber, info.durationMinutes, info.priority,info.major); // requiredResources 後續分配
         }
 
         // 優化並 print 時間表（只一次）
@@ -60,13 +63,15 @@ public class createTaskCommand implements Command {
         int studentsNumber;
         long durationMinutes;
         int priority;
+        String major;
 
-        TaskInfo(String name, String description, int studentsNumber, long durationMinutes, int priority) {
+        TaskInfo(String name, String description, int studentsNumber, long durationMinutes, int priority, String major) {
             this.name = name;
             this.description = description;
             this.studentsNumber = studentsNumber;
             this.durationMinutes = durationMinutes;
             this.priority = priority;
+            this.major = major;
         }
     }
 }

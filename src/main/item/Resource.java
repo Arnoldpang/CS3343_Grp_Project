@@ -13,7 +13,7 @@ public class Resource {
 
     private String name; // 修改：從 public 改為 private 以符合封裝
     private int capacity; // 新增：資源容量
-    private HashMap<Date, Boolean> availabilitySchedule; // 新增：可用性時間表（日期 -> 是否可用）
+    HashMap<Date, Boolean> availabilitySchedule; // 新增：可用性時間表（日期 -> 是否可用）
 
     private enum status { // 修改：從 static enum 改為 private enum
         AVAILABLE, BORROWED, DELETED
@@ -106,7 +106,7 @@ public class Resource {
     }
 
     public boolean isAvailableOnDate(Date date) {
-        return this.availabilitySchedule.getOrDefault(date, true); // 改為預設 true (可用)
+        return this.availabilitySchedule.getOrDefault(date, true); // 改為 true
     }
 
     // 新增：計算利用率（例如，可用日期比例，假設總日期為 schedule 大小）
@@ -122,7 +122,5 @@ public class Resource {
         return new ArrayList<>(Resources.values());
     }
 
-    public String getName() {
-        return this.name;
-    }
+
 }
