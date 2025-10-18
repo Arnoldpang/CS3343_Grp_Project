@@ -1,61 +1,51 @@
 package main.item;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 public class Task {
     static HashMap<Integer, Task> tasks = new HashMap<>(); // 靜態儲存所有任務，以 ID 為 key
     private static int nextId = 1; // 自動生成 ID
-
     private int id;
     private String name;
     private String description;
     private int studentsNumber; // 學生人數
     private long durationMinutes; // 持續時間（分鐘）
     private int priority; // 1-10，越高越優先
-    private static List<Resource> requiredResources; // 所需資源列表（自動分配）
+    private List<Resource> requiredResources; // 修改：移除 static，使其為實例變數
     private String assignedDay; // 分配的日子
     private int assignedStartHour; // 開始小時
     private String major; // 新增：專業 (e.g., "computer science", "bio")
-
     private enum Status { // 任務狀態
         PENDING, IN_PROGRESS, COMPLETED
     }
     private Status status;
-
-    private Task(String name, String description, int studentsNumber, long durationMinutes, int priority, List<Resource> requiredResources, String major) {
+    private Task(String name, String description, int studentsNumber, long durationMinutes, int priority, String major) {
         this.id = nextId++;
         this.name = name;
         this.description = description;
         this.studentsNumber = studentsNumber;
         this.durationMinutes = durationMinutes;
         this.priority = priority;
-        this.requiredResources = (requiredResources != null) ? requiredResources : new ArrayList<>();
+        this.requiredResources = new ArrayList<>();
         this.status = Status.PENDING;
         this.assignedDay = null;
         this.assignedStartHour = -1;
         this.major = major; // 新增
-
-        // 驗證
+// 驗證
         if (studentsNumber <= 0 || durationMinutes <= 0 || major == null || major.isEmpty()) {
             throw new IllegalArgumentException("Students number, duration, and major must be valid.");
         }
     }
-
     public static void createTask(String name, String description, int studentsNumber, long durationMinutes, int priority, String major) {
-        Task task = new Task(name, description, studentsNumber, durationMinutes, priority, requiredResources, major); // 新增 major
+        Task task = new Task(name, description, studentsNumber, durationMinutes, priority, major);
         tasks.put(task.getId(), task);
     }
-
     public static Task getTaskById(int id) {
         return tasks.get(id);
     }
-
     public static List<Task> getAllTasks() {
         return new ArrayList<>(tasks.values());
     }
-
     public static void printTasks() {
         System.out.println("Tasks:");
         for (Integer key : tasks.keySet()) {
@@ -66,11 +56,9 @@ public class Task {
                     " - Priority: " + t.getPriority() + " - Resource: " + resourceNames + timeInfo + " - Status: " + t.getStatus());
         }
     }
-
     public static void removeTask(int id) {
         tasks.remove(id);
     }
-
     // Getter 方法
     public int getId() { return id; }
     public String getName() { return name; }
@@ -83,20 +71,17 @@ public class Task {
     public String getAssignedDay() { return assignedDay; }
     public int getAssignedStartHour() { return assignedStartHour; }
     public String getMajor() { return major; } // 新增 getter
-
     // Setter 方法
     public void setAssignedDay(String day) {
         this.assignedDay = day;
     }
-
     public void setAssignedStartHour(int hour) {
-        if (hour >= 0 && hour < 24) {
+        if (hour == -1 || (hour >= 0 && hour < 24)) {
             this.assignedStartHour = hour;
         } else {
             throw new IllegalArgumentException("Invalid hour.");
         }
     }
-
     // 更新方法
     public void updateDetails(String newDescription, int newStudentsNumber, long newDurationMinutes) {
         this.description = newDescription;

@@ -49,10 +49,10 @@ public class createTaskCommand implements Command {
             Task.createTask(info.name, info.description, info.studentsNumber, info.durationMinutes, info.priority,info.major); // requiredResources 後續分配
         }
 
-        // 優化並 print 時間表（只一次）
+
         ScheduleManager manager = new ScheduleManager();
         manager.optimizeSchedule();
-        manager.printSchedule();
+
 
         System.out.println("Tasks created and schedule allocated successfully.");
     }
