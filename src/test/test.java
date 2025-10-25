@@ -84,7 +84,7 @@ public class test {
     	ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
         Resource.printResources();
-        String expected = "Resources:\r\nComputer - AVAILABLE (Capacity: 10, Utilization: 0.0%)\r\n";
+        String expected = "Resources:" + System.lineSeparator() + "Computer - AVAILABLE (Capacity: 10, Utilization: 0.0%)" + System.lineSeparator(); // https://www.reddit.com/r/learnjava/comments/wac6wr/is_the_new_line_character_n_platform_dependent/
         assertEquals(expected,outContent.toString());
     }
 }
