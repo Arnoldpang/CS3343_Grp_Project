@@ -79,4 +79,12 @@ public class test {
         assertTrue(rs.isAvailableOnDate(d1));
         assertEquals(rs.getUtilization(), 66.67, 0.01);
     }
+
+    public void printResourcesTestOne() { // https://stackoverflow.com/questions/32241057/how-to-test-a-print-method-in-java-using-junit
+    	ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+        Resource.printResources();
+        String expected = "Resources:\r\nComputer - AVAILABLE (Capacity: 10, Utilization: 0.0%)\r\n";
+        assertEquals(expected,outContent.toString());
+    }
 }
