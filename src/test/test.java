@@ -80,7 +80,7 @@ public class test {
         assertEquals(rs.getUtilization(), 66.67, 0.01);
     }
 
-        @Test
+    @Test
     public void printResourcesTestOne() { // https://stackoverflow.com/questions/32241057/how-to-test-a-print-method-in-java-using-junit
     	ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
@@ -125,5 +125,12 @@ public class test {
     	String expected = rs.getStatus();
     	rs.returnResource();
     	assertEquals(expected,rs.getStatus());
+    }
+
+    @Test
+    public void getResourceTest() {
+    	Resource rs = Resource.getResource("Computer");
+    	rs.deleteResources();
+    	assertNull(Resource.getResource("Computer"));
     }
 }
