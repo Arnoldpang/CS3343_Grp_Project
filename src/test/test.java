@@ -80,11 +80,50 @@ public class test {
         assertEquals(rs.getUtilization(), 66.67, 0.01);
     }
 
+        @Test
     public void printResourcesTestOne() { // https://stackoverflow.com/questions/32241057/how-to-test-a-print-method-in-java-using-junit
     	ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
         Resource.printResources();
-        String expected = "Resources:" + System.lineSeparator() + "Computer - AVAILABLE (Capacity: 10, Utilization: 0.0%)" + System.lineSeparator(); // https://www.reddit.com/r/learnjava/comments/wac6wr/is_the_new_line_character_n_platform_dependent/
+        String expected = String.format("Resources:%nComputer - AVAILABLE (Capacity: 10, Utilization: 0.0%%)%n"); // https://stackoverflow.com/questions/207947/how-do-i-get-a-platform-independent-new-line-character
         assertEquals(expected,outContent.toString());
+    }
+    
+    @Test
+    public void printResourcesTestTwo() { // https://stackoverflow.com/questions/32241057/how-to-test-a-print-method-in-java-using-junit
+    	Resource rs = Resource.getResource("Computer");
+    	ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+        rs.deleteResources();
+        Resource.printResources();
+        String expected = String.format("Resources:%nNull%n");
+        assertEquals(expected,outContent.toString());
+    }
+    
+    @Test
+    public void returnResourceTestOne() {
+    	Resource rs = Resource.getResource("Computer");
+    	String expected = rs.getStatus();
+    	rs.borrowResource();
+    	rs.returnResource();
+    	assertEquals(expected,rs.getStatus());
+    }
+    
+    @Test
+    public void returnResourceTestTwo() {
+    	Resource rs = Resource.getResource("Computer");
+    	rs.borrowResource();
+    	rs.deleteResources();
+    	String expected = rs.getStatus();
+    	rs.returnResource();
+    	assertEquals(expected,rs.getStatus());
+    }
+    
+    @Test
+    public void returnResourceTestThree() {
+    	Resource rs = Resource.getResource("Computer");
+    	String expected = rs.getStatus();
+    	rs.returnResource();
+    	assertEquals(expected,rs.getStatus());
     }
 }
