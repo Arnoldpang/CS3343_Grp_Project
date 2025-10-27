@@ -37,26 +37,22 @@ public class Booking {
     }
 
     // View the specific user booking
-    public static void printBooking(String username){
+    public static int printBooking(String username){
         System.out.println(username + " Booking:");
+        int count=0;
         for (Booking b : BookingRecords){
-            if(username.equals(b.username))
+            if(username.equals(b.username)) {
+                count++;
                 System.out.println(b.rs.getName() + " - " + b.username);
+            }
         }
-        if(BookingRecords.isEmpty())
+        if(count==0) {
             System.out.println("Null");
+        }
+        return count;
     }
 
-    public static void cancelBooking(String username, Scanner sc){
-        System.out.println("You have below bookings:");
-        for (Booking b : BookingRecords){
-            if(username.equals(b.username))
-                System.out.println(b.rs.getName() + " - " + b.username);
-        }
-        if(BookingRecords.isEmpty())
-            System.out.println("Null");
-        System.out.println("Please input resource name to cancel related booking");
-        String rsString = sc.next();
+    public static void cancelBooking(String rsString){
         if(BookingRecords.remove(Resource.getResource(rsString)))
             System.out.println("Cancel successfully");
         else
