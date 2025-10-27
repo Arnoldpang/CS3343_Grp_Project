@@ -21,7 +21,7 @@ public class main {
                 commandList.get(inputInt).execute(sc);
             }else{
                 // todo
-                System.out.print("Input number of commands (1: logout, 2: manage Resource, 3: manage Task): ");
+                System.out.print("Input number of commands (1: logout, 2: Manage resource, 3: Manage task, 4: manage booking): ");
                 int inputInt =sc.nextInt();
                 sc.nextLine();
                 commandList.get(inputInt).execute(sc);
@@ -39,5 +39,6 @@ public class main {
         commandList.put(1, new logoutCommand());
         commandList.put(2, new manageResourceCommand());
         commandList.put(3, new manageTaskCommand());
+        commandList.put(4, new manageBookingCommand());
     }
 }
