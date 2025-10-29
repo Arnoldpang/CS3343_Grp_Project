@@ -14,6 +14,7 @@ public class test {
     @BeforeEach
     public void setUp() {
         Resource.createResource("Computer", 10);
+        Task.createTask("test", "test", new Date(), new Date(), 0, null);
     }
 
     @Test
@@ -132,5 +133,13 @@ public class test {
     	Resource rs = Resource.getResource("Computer");
     	rs.deleteResources();
     	assertNull(Resource.getResource("Computer"));
+    }
+
+    @Test
+    public void createTaskTest() {
+    	Task tsk = Task.getTaskById(2);
+    	assertEquals(tsk,Task.getTaskById(2));
+    	Task tskTwo = Task.getTaskById(20);
+    	assertEquals(tskTwo,Task.getTaskById(100));
     }
 }
