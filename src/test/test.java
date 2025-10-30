@@ -1,145 +1,169 @@
 package test;
 
-import main.SampleTesting;
-import main.command.createTaskCommand;
-import main.item.Resource;
-import main.item.Task;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
+import main.item.*;
+import org.junit.jupiter.api.*;
 import java.io.*;
 import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class test {
     @BeforeEach
-    public void setUp() {
-        Resource.createResource("Computer", 10);
-        Task.createTask("test", "test", new Date(), new Date(), 0, null);
-    }
+    public void setUp() {}
 
     @Test
     public void createResourceTest() {
-        Resource rs = Resource.getResource("Computer");
-        Resource res = Resource.getResource("Laptop");
-
-        assertNotNull(rs);
-        assertEquals(rs.getCapacity(), 10);
-        assertEquals(rs.getStatus(), "AVAILABLE");
-        assertEquals(rs.getUtilization(), 0.0);
-        assertNull(res);
+    	Resource.createResource("Computer", 10);
+        Resource rc = Resource.getResource("Computer");
+        assertEquals(10, rc.getCapacity());
+        assertEquals("AVAILABLE", rc.getStatus());
+        assertEquals(0.0, rc.getUtilization());
+        
+        Resource.createResource("Speaker", 2);
+        Resource rs = Resource.getResource("Speaker");
+        assertEquals(2, rs.getCapacity());
+        assertEquals("AVAILABLE", rc.getStatus());
+        assertEquals(0.0, rc.getUtilization());
+    }
+    
+    @Test
+    public void getResourceTest() {
+    	Resource.createResource("Computer", 10);
+    	Resource rc = Resource.getResource("Computer");
+    	assertEquals("Computer", rc.getName());
+    	
+        Resource.createResource("Laptop", 5);
+    	Resource rl = Resource.getResource("Laptop");
+    	assertEquals("Laptop", rl.getName());
+    	
+    	Resource.createResource("Keyboard", 9);
+    	Resource rk = Resource.getResource("Keyboard");
+    	assertEquals("Keyboard", rk.getName());
     }
 
     @Test
     public void borrowResourceTest() {
-        Resource rs = Resource.getResource("Computer");
-
+    	Resource.createResource("Computer", 10);
+        Resource rc = Resource.getResource("Computer"); 
+        assertEquals(rc.getStatus(), "AVAILABLE");
+        rc.borrowResource();
+        assertEquals("BORROWED", rc.getStatus());
+        rc.borrowResource();
+        assertEquals("BORROWED", rc.getStatus());
+        
+        Resource.createResource("Speaker", 2);
+        Resource rs = Resource.getResource("Speaker");
+        assertEquals("AVAILABLE", rs.getStatus());
         rs.borrowResource();
-        assertEquals(rs.getStatus(), "BORROWED");
-
-        rs.borrowResource();
-        assertEquals(rs.getStatus(), "BORROWED");
+        assertEquals("BORROWED", rs.getStatus());
     }
 
     @Test
-    public void deleteResourcesTest() {
-        Resource rs = Resource.getResource("Computer");
-
-        rs.deleteResources();
-        assertNull(rs);
-        assertEquals(rs.getStatus(), "DELETED");
+    public void deleteResourceTest() {
+    	Resource.createResource("Computer", 10);
+        Resource rc = Resource.getResource("Computer");
+        rc.deleteResources();
+        assertNull(Resource.getResource("Computer"));
+        assertEquals("DELETED", rc.getStatus());
+    	
+    	Resource.createResource("Keyboard", 9);
+        Resource rk = Resource.getResource("Keyboard");
+        rk.deleteResources();
+        assertNull(Resource.getResource("Keyboard"));
+        assertEquals("DELETED", rc.getStatus());
     }
 
     @Test
     public void setCapacityTest() {
-        Resource rs = Resource.getResource("Computer");
-
-        rs.setCapacity(20);
-        assertEquals(rs.getCapacity, 20);
-
-        rs.setCapacity(-1);
-        assertEquals(rs.getCapacity, 20);
+    	Resource.createResource("Computer", 10);
+        Resource rc = Resource.getResource("Computer");
+        rc.setCapacity(20);
+        assertEquals(20, rc.getCapacity());
+        rc.setCapacity(-1);
+        assertEquals(20, rc.getCapacity());
+        
+        Resource.createResource("Keyboard", 9);
+        Resource rk = Resource.getResource("Keyboard");        
+        rk.setCapacity(-1);
+        assertEquals(9, rk.getCapacity());
     }
 
     @Test
     public void availabilityScheduleTest() {
-        Resource rs = Resource.getResource("Computer");
         Calendar c1 = Calendar.getInstance();
-        Calendar c2 = Calendar.getInstance();
         c1.add(Calendar.DAY_OF_MONTH, 1);
+        Calendar c2 = Calendar.getInstance();
         c2.add(Calendar.DAY_OF_MONTH, 2);
         Date d1 = new Date();
         Date d2 = c1.getTime();
         Date d3 = c2.getTime();
 
-        assertFalse(rs.isAvailableOnDate(d1));
-        assertEquals(rs.getUtilization(), 0.0);
-
-        rs.updateAvailability(d1, true);
-        rs.updateAvailability(d2, true);
-        rs.updateAvailability(d3, false);
-        assertTrue(rs.isAvailableOnDate(d1));
-        assertEquals(rs.getUtilization(), 66.67, 0.01);
+        Resource.createResource("Computer", 10);
+        Resource rc = Resource.getResource("Computer");
+        assertFalse(rc.isAvailableOnDate(d1));
+        assertEquals(rc.getUtilization(), 0.0);
+        rc.updateAvailability(d1, true);
+        rc.updateAvailability(d2, true);
+        rc.updateAvailability(d3, false);
+        assertTrue(rc.isAvailableOnDate(d1));
+        assertEquals(66.67, rc.getUtilization(), 0.01);
+        
+        Resource.createResource("Keyboard", 9);
+    	Resource rk = Resource.getResource("Keyboard");
+        assertFalse(rk.isAvailableOnDate(d2));
+        assertEquals(rk.getUtilization(), 0.0);
+        rk.updateAvailability(d1, false);
+        rk.updateAvailability(d2, true);
+        rk.updateAvailability(d3, false);
+        assertFalse(rk.isAvailableOnDate(d1));
+        assertEquals(33.33, rk.getUtilization(), 0.01);
     }
 
     @Test
-    public void printResourcesTestOne() { // https://stackoverflow.com/questions/32241057/how-to-test-a-print-method-in-java-using-junit
+    public void printResourceTestOne() { // https://stackoverflow.com/questions/32241057/how-to-test-a-print-method-in-java-using-junit
+    	Resource.createResource("Computer", 10);
     	ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
+    	String expected = String.format("Resources:%nComputer - AVAILABLE (Capacity: 10, Utilization: 0.0%%)%n"); // https://stackoverflow.com/questions/207947/how-do-i-get-a-platform-independent-new-line-character
+    	System.setOut(new PrintStream(outContent));
         Resource.printResources();
-        String expected = String.format("Resources:%nComputer - AVAILABLE (Capacity: 10, Utilization: 0.0%%)%n"); // https://stackoverflow.com/questions/207947/how-do-i-get-a-platform-independent-new-line-character
-        assertEquals(expected,outContent.toString());
+        assertEquals(expected, outContent.toString());
     }
     
     @Test
-    public void printResourcesTestTwo() { // https://stackoverflow.com/questions/32241057/how-to-test-a-print-method-in-java-using-junit
-    	Resource rs = Resource.getResource("Computer");
+    public void printResourceTestTwo() { // https://stackoverflow.com/questions/32241057/how-to-test-a-print-method-in-java-using-junit
+        Resource.createResource("Keyboard", 9);
+    	Resource rk = Resource.getResource("Keyboard");
     	ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    	String expected = String.format("Resources:%nNull%n");
         System.setOut(new PrintStream(outContent));
-        rs.deleteResources();
+        rk.deleteResources();
         Resource.printResources();
-        String expected = String.format("Resources:%nNull%n");
-        assertEquals(expected,outContent.toString());
+        assertEquals(expected, outContent.toString());
     }
     
     @Test
-    public void returnResourceTestOne() {
-    	Resource rs = Resource.getResource("Computer");
-    	String expected = rs.getStatus();
+    public void returnResourceTest() {
+    	Resource.createResource("Computer", 10);
+    	Resource rc = Resource.getResource("Computer");
+    	rc.returnResource();
+    	assertEquals("AVAILABLE", rc.getStatus());
+    	rc.borrowResource();
+    	rc.returnResource();
+    	assertEquals("AVAILABLE", rc.getStatus());
+    	rc.borrowResource();
+    	rc.deleteResources();
+    	rc.returnResource();
+    	assertEquals("DELETED", rc.getStatus());
+    	
+    	Resource.createResource("Speaker", 2);
+    	Resource rs = Resource.getResource("Speaker");
+    	rs.borrowResource();
+    	rs.borrowResource();
     	rs.borrowResource();
     	rs.returnResource();
-    	assertEquals(expected,rs.getStatus());
-    }
-    
-    @Test
-    public void returnResourceTestTwo() {
-    	Resource rs = Resource.getResource("Computer");
+    	assertEquals("AVAILABLE", rs.getStatus());
+    	rs.deleteResources();
     	rs.borrowResource();
-    	rs.deleteResources();
-    	String expected = rs.getStatus();
     	rs.returnResource();
-    	assertEquals(expected,rs.getStatus());
-    }
-    
-    @Test
-    public void returnResourceTestThree() {
-    	Resource rs = Resource.getResource("Computer");
-    	String expected = rs.getStatus();
-    	rs.returnResource();
-    	assertEquals(expected,rs.getStatus());
-    }
-
-    @Test
-    public void getResourceTest() {
-    	Resource rs = Resource.getResource("Computer");
-    	rs.deleteResources();
-    	assertNull(Resource.getResource("Computer"));
-    }
-
-    @Test
-    public void createTaskTest() {
-    	Task tsk = Task.getTaskById(2);
-    	assertEquals(tsk,Task.getTaskById(2));
-    	Task tskTwo = Task.getTaskById(20);
-    	assertEquals(tskTwo,Task.getTaskById(100));
+    	assertEquals("DELETED", rs.getStatus());
     }
 }
