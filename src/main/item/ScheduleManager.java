@@ -121,30 +121,67 @@ public class ScheduleManager {
     }
     public void printSchedule() {
         List<Task> allTasks = Task.getAllTasks();
-        Set<String> majors = new HashSet<>();
+        Set<String> majors = new TreeSet<>(); // 使用 TreeSet 排序 majors
         for (Task t : allTasks) {
             majors.add(t.getMajor());
         }
         for (String major : majors) {
-            System.out.println("\n=== Schedule for Major: " + major + " ===");
+            printScheduleForMajor(major);
+        }
+    }
+    public void printScheduleForMajor(String major) {
+        List<Task> allTasks = Task.getAllTasks();
+        System.out.println("\n=== Schedule for Major: " + major + " ===");
+// 收集每個時間槽的資料
+        Map<String, Map<String, String>> scheduleTable = new HashMap<>(); // time -> day -> taskInfo
+        for (int hour = START_HOUR; hour < END_HOUR; hour++) {
+            String timeStr = String.format("%02d:00", hour);
+            Map<String, String> dayMap = new HashMap<>();
             for (String day : DAYS) {
-                System.out.println("\n# Day: " + day);
-                Map<Integer, String> slotInfo = new HashMap<>();
-                for (Task t : allTasks) {
-                    if (t.getMajor().equals(major) && t.getAssignedDay() != null && t.getAssignedDay().equals(day)) {
-                        int start = t.getAssignedStartHour();
-                        int slots = (int) Math.ceil((double) t.getDurationMinutes() / SLOT_DURATION_MIN);
-                        for (int s = 0; s < slots; s++) {
-                            int h = start + s;
-                            slotInfo.put(h, t.getName() + " (ID:" + t.getId() + ", Students:" + t.getStudentsNumber() + ")");
-                        }
-                    }
-                }
-                for (int hour = START_HOUR; hour < END_HOUR; hour++) {
-                    String taskInfo = slotInfo.getOrDefault(hour, "Free");
-                    System.out.println(hour + ":00 - " + (hour + 1) + ":00 : " + taskInfo);
+                dayMap.put(day, "Free");
+            }
+            scheduleTable.put(timeStr, dayMap);
+        }
+        for (Task t : allTasks) {
+            if (t.getMajor().equals(major) && t.getAssignedDay() != null) {
+                int start = t.getAssignedStartHour();
+                int slots = (int) Math.ceil((double) t.getDurationMinutes() / SLOT_DURATION_MIN);
+                String taskInfo = t.getName() + " (ID:" + t.getId() + ", Students:" + t.getStudentsNumber() + ", Resource:" +
+                        (t.getRequiredResources().isEmpty() ? "None" : t.getRequiredResources().get(0).getName()) + ")";
+                for (int s = 0; s < slots; s++) {
+                    int h = start + s;
+                    String timeStr = String.format("%02d:00", h);
+                    scheduleTable.get(timeStr).put(t.getAssignedDay(), taskInfo);
                 }
             }
+        }
+// 輸出表格
+// 標頭
+        System.out.printf("%-10s", "Time");
+        for (String day : DAYS) {
+            System.out.printf("| %-20s", day.substring(0, 3)); // 縮短日子名稱
+        }
+        System.out.println();
+// 分隔線
+        System.out.printf("%-10s", "----------");
+        for (int i = 0; i < DAYS.length; i++) {
+            System.out.printf("| %-20s", "--------------------");
+        }
+        System.out.println();
+// 內容
+        for (int hour = START_HOUR; hour < END_HOUR; hour++) {
+            String timeStr = String.format("%02d:00", hour);
+            System.out.printf("%-10s", timeStr);
+            Map<String, String> dayMap = scheduleTable.get(timeStr);
+            for (String day : DAYS) {
+                String info = dayMap.get(day);
+// 截斷過長的資訊
+                if (info.length() > 18) {
+                    info = info.substring(0, 15) + "...";
+                }
+                System.out.printf("| %-20s", info);
+            }
+            System.out.println();
         }
     }
     private double getResourceLoad(Resource res) {
