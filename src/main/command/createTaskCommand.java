@@ -2,10 +2,9 @@ package main.command;
 
 import main.item.Resource;
 import main.item.Task;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import main.item.ScheduleManager; // 假設 ScheduleManager 在 main.item
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -14,49 +13,65 @@ public class createTaskCommand implements Command {
 
     @Override
     public void execute(Scanner sc) {
-        System.out.print("Input task name: ");
-        String name = sc.nextLine();
 
-        System.out.print("Input task description: ");
-        String description = sc.nextLine();
-
-        System.out.print("Input start time (YYYY-MM-DD HH:mm): ");
-        String startStr = sc.nextLine();
-        System.out.print("Input end time (YYYY-MM-DD HH:mm): ");
-        String endStr = sc.nextLine();
-
-        System.out.print("Input priority (1-10): ");
-        int priority = sc.nextInt();
+        System.out.print("Input major (e.g., computer science, bio): "); // 新增輸入
+        String major = sc.nextLine();
+        System.out.print("Input number of classes to create: ");
+        int numClasses = sc.nextInt();
         sc.nextLine(); // 消耗換行符
 
-        // 解析日期
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        try {
-            Date startTime = sdf.parse(startStr);
-            Date endTime = sdf.parse(endStr);
+        List<TaskInfo> taskInfos = new ArrayList<>();
+        for (int i = 0; i < numClasses; i++) {
+            System.out.println("Class " + (i + 1) + ":");
+            System.out.print("Input class name: ");
+            String name = sc.nextLine();
 
-            // 處理 requiredResources（輸入資源名稱，用逗號分隔）
-            System.out.print("Input required resource names (comma-separated, or leave empty): ");
-            String resourcesStr = sc.nextLine();
-            List<Resource> requiredResources = new ArrayList<>();
-            if (!resourcesStr.isEmpty()) {
-                String[] resourceNames = resourcesStr.split(",");
-                for (String resName : resourceNames) {
-                    Resource res = Resource.getResource(resName.trim());
-                    if (res != null) {
-                        requiredResources.add(res);
-                    } else {
-                        System.out.println("Resource " + resName + " not found. Skipping.");
-                    }
-                }
-            }
+            System.out.print("Input class description: ");
+            String description = sc.nextLine();
 
-            Task.createTask(name, description, startTime, endTime, priority, requiredResources);
-            System.out.println("Task created successfully.");
-        } catch (ParseException e) {
-            System.out.println("Invalid date format. Task creation failed.");
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
+            System.out.print("Input students number: ");
+            int studentsNumber = sc.nextInt();
+            sc.nextLine();
+
+            System.out.print("Input duration (minutes): ");
+            long durationMinutes = sc.nextLong();
+            sc.nextLine();
+
+            System.out.print("Input priority (1-10): ");
+            int priority = sc.nextInt();
+            sc.nextLine();
+
+            taskInfos.add(new TaskInfo(name, description, studentsNumber, durationMinutes, priority, major));
+        }
+
+        // 現在創建所有 Task
+        for (TaskInfo info : taskInfos) {
+            Task.createTask(info.name, info.description, info.studentsNumber, info.durationMinutes, info.priority,info.major); // requiredResources 後續分配
+        }
+
+
+        ScheduleManager manager = new ScheduleManager();
+        manager.optimizeSchedule();
+
+
+        System.out.println("Tasks created and schedule allocated successfully.");
+    }
+
+    private static class TaskInfo {
+        String name;
+        String description;
+        int studentsNumber;
+        long durationMinutes;
+        int priority;
+        String major;
+
+        TaskInfo(String name, String description, int studentsNumber, long durationMinutes, int priority, String major) {
+            this.name = name;
+            this.description = description;
+            this.studentsNumber = studentsNumber;
+            this.durationMinutes = durationMinutes;
+            this.priority = priority;
+            this.major = major;
         }
     }
 }

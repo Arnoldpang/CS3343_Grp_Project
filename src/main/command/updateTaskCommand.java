@@ -1,9 +1,6 @@
 package main.command;
 
 import main.item.Task;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Scanner;
 
 public class updateTaskCommand implements Command {
@@ -24,33 +21,27 @@ public class updateTaskCommand implements Command {
         System.out.print("Input new description (or press Enter to skip): ");
         String newDescription = sc.nextLine();
         if (newDescription.isEmpty()) {
-            newDescription = task.getDescription(); // 保持原值
+            newDescription = task.getDescription();
         }
 
-        System.out.print("Input new start time (YYYY-MM-DD HH:mm, or press Enter to skip): ");
-        String startStr = sc.nextLine();
-        Date newStartTime = task.getStartTime(); // 預設原值
-        if (!startStr.isEmpty()) {
-            try {
-                newStartTime = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(startStr);
-            } catch (ParseException e) {
-                System.out.println("Invalid start time format. Keeping original.");
-            }
+        System.out.print("Input new students number (or 0 to skip): ");
+        int newStudentsNumber = sc.nextInt();
+        if (newStudentsNumber == 0) {
+            newStudentsNumber = task.getStudentsNumber();
         }
+        sc.nextLine(); // 消耗
 
-        System.out.print("Input new end time (YYYY-MM-DD HH:mm, or press Enter to skip): ");
-        String endStr = sc.nextLine();
-        Date newEndTime = task.getEndTime(); // 預設原值
-        if (!endStr.isEmpty()) {
-            try {
-                newEndTime = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(endStr);
-            } catch (ParseException e) {
-                System.out.println("Invalid end time format. Keeping original.");
-            }
+        System.out.print("Input new duration minutes (or 0 to skip): ");
+        long newDurationMinutes = sc.nextLong();
+        if (newDurationMinutes == 0) {
+            newDurationMinutes = task.getDurationMinutes();
         }
+        sc.nextLine(); // 消耗
 
         try {
-            task.updateDetails(newDescription, newStartTime, newEndTime);
+            task.updateDetails(newDescription, newStudentsNumber, newDurationMinutes);
+            // 可選：重新分配資源，如果人數變了
+            // ... (如果需要，呼叫分配邏輯)
             System.out.println("Task updated successfully.");
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
