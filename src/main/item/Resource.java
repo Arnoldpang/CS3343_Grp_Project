@@ -24,12 +24,7 @@ public class Resource {
         Resources.put(name, rs);
     }
     public static Resource getResource(String name){
-        for (Resource r : Resources.values()){
-            if (r.getName().toLowerCase().equals(name.toLowerCase())) {
-                return r;
-            }
-        }
-        return null;
+        return Resources.get(name);
     }
     public static void printResources(){
         System.out.println("Resources:");

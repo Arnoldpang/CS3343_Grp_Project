@@ -10,10 +10,16 @@ public class borrowResourceCommand implements Command{
 
     @Override
     public void execute(Scanner sc) {
-        System.out.print("Input the resource name you want to borrow");
+        System.out.print("Input the resource name you want to borrow ");
         String input = sc.nextLine();
         Resource rs = Resource.getResource(input);
-        rs.borrowResource();
-        System.out.println("Borrowed successfully");
+        if(rs != null){
+            rs.borrowResource();
+            System.out.println("Borrowed successfully");
+        }
+        else{
+            System.out.println("Resource not found");
+        }
+
     }
 }
